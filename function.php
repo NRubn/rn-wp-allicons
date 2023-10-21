@@ -111,23 +111,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if($fontawesome==="true"){
-        downloadfontawesome();
+        #downloadfontawesome();
     }
 
     if($dashicons==="true"){
-        
         echo '<i class="dashicons dashicons-admin-home"></i>';
     }
 }
+
 add_action('admin_menu', 'rn_wp_all_icons_admin_menu');
 
 function enqueue_wp_dashicons_if_enabled() {
-    $enable_dashicons_option = get_option('enable_dashicons');
+    $enable_dashicons_option = get_option('rn_enable_dashicons');
 
     if ($enable_dashicons_option === 'on') {
         wp_enqueue_style('dashicons');
     }
 }
+
 add_action('wp_enqueue_scripts', 'enqueue_wp_dashicons_if_enabled');
 
 /*TO DO: Hier klappt der Download noch nicht*/
