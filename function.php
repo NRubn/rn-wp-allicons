@@ -69,12 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-    // Hier können Sie den HTML-Code für Ihre Einstellungsseite erstellen.
     echo '<div class="wrap">';
     echo '<h2>RN WP All Icons Einstellungen</h2>';
     echo '<p>Einstellungen</p>';
-    // Fügen Sie hier das Formular oder die Einstellungsoptionen hinzu.
-
     // Formular erstellen
     echo '<form method="post">';
     echo '<h3>Wählen Sie die Icon-Sets aus:</h3>';
@@ -91,7 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo '<label style="display: none;"><input type="checkbox" name="rn_enable_icon" value="true" checked></label>';
     echo '<input type="submit" value="Aktivieren">';
     echo '</form>';
-    
+    $fontawesome='false';
+    $dashicons='false';
 
     foreach ($rn_icon_sets as $icon_set_name => $icon_set_title) {
         // Überprüfen, ob die Option in der Datenbank aktiv ist
@@ -99,19 +97,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $link = '';
         if($icon_set_name === 'rn_enable_dashicons'){
             $link = 'https://developer.wordpress.org/resource/dashicons/';
+            $dashicons='true';
         }
         if($icon_set_name === 'rn_enable_fontawesome'){
             $link = 'https://fontawesome.com/';
+            $fontawesome='true';
         }
         if ($option_value === 'on') {
-            echo '<p>Eine Liste mit allen ' . esc_html($icon_set_title) . ' Icons findest du hier <a href="'.$link.' target=”_blank”">Link zur Dokumentation</a></p>';
+            echo '<p>Eine Liste mit allen ' . esc_html($icon_set_title) . ' Icons findest du hier <a href="'.$link.'" target=”_blank">Link zur Dokumentation</a></p>';
         } else {
             echo '<p>' . esc_html($icon_set_title) . ' deaktiviert</p>';
         }
     }
 
+    if($fontawesome==="true"){
+        downloadfontawesome();
+    }
+
+    if($dashicons==="true"){
+        
+        echo '<i class="dashicons dashicons-admin-home"></i>';
+    }
 }
-
-// Fügen Sie die Hook-Funktion hinzu, um das Menüelement anzuzeigen
-
 add_action('admin_menu', 'rn_wp_all_icons_admin_menu');
+
+function enqueue_wp_dashicons_if_enabled() {
+    $enable_dashicons_option = get_option('enable_dashicons');
+
+    if ($enable_dashicons_option === 'on') {
+        wp_enqueue_style('dashicons');
+    }
+}
+add_action('wp_enqueue_scripts', 'enqueue_wp_dashicons_if_enabled');
+
+/*TO DO: Hier klappt der Download noch nicht*/
+function downloadfontawesome(){
+    $pluginPath = plugins_url('', __FILE__);
+    $fontAwesomeUrl = 'https://fontawesome.com/v5.15.1/assets/font-awesome-5.15.1-web.zip'; // URL zur Font-Awesome-ZIP-Datei
+    $downloadPath =  $pluginPath . '/Font-Awesome-zip/font-awesome.zip'; // Pfad zum Herunterladen der ZIP-Datei
+    $extractPath =  $pluginPath . '/assets/fontawesome'; // Pfad zum Extrahieren der Font Awesome-Dateien
+
+    // Den Inhalt der Font-Awesome-ZIP-Datei herunterladen
+    $fileContents = file_get_contents($fontAwesomeUrl);
+
+    if ($fileContents !== false) {
+        // Datei im angegebenen Verzeichnis speichern
+        if (file_put_contents($downloadPath, $fileContents) !== false) {
+            // ZIP-Datei extrahieren
+            $zip = new ZipArchive();
+            if ($zip->open($downloadPath) === true) {
+                $zip->extractTo($extractPath);
+                $zip->close();
+                echo 'Font Awesome wurde erfolgreich heruntergeladen und in ' . $extractPath . ' extrahiert.';
+            } else {
+                echo 'Fehler beim Extrahieren der ZIP-Datei.';
+            }
+        } else {
+            echo 'Fehler beim Speichern der Font Awesome-Datei.';
+        }
+    } else {
+        echo 'Fehler beim Herunterladen der Font Awesome-Datei.';
+    }
+}
