@@ -111,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if($fontawesome==="true"){
+        #first fix this
         #downloadfontawesome();
     }
 
@@ -130,6 +131,24 @@ function enqueue_wp_dashicons_if_enabled() {
 }
 
 add_action('wp_enqueue_scripts', 'enqueue_wp_dashicons_if_enabled');
+
+
+function load_fontawesome_css() {
+    $rn_enable_fontawesome = get_option('rn_enable_fontawesome');
+
+    if ($rn_enable_fontawesome === 'on') {
+        $plugin_dir = plugin_dir_url(__FILE__);
+        $css_file_path = $plugin_dir . 'assets/fontawesome-free-web/css/all.min.css';
+        $fontawesome_version = '6.4.2'; //Kann später aus einer Option gelesen werden
+        // Stil registrieren und laden
+        wp_register_style('fontawesome', $css_file_path, array(), $fontawesome_version);
+        wp_enqueue_style('fontawesome');
+    }
+
+    
+}
+
+add_action('wp_enqueue_scripts', 'load_fontawesome_css');
 
 /*TO DO: Hier klappt der Download noch nicht*/
 function downloadfontawesome(){
