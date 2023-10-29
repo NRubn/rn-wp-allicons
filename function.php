@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if($fontawesome==="true"){
-        #first fix this
+        //TO DO: For futute: use downloadfunction for fresh Fontawesome Version
         #downloadfontawesome();
     }
 
@@ -148,33 +148,3 @@ function load_fontawesome_css() {
 }
 
 add_action('wp_enqueue_scripts', 'load_fontawesome_css');
-
-/*TO DO: Hier klappt der Download noch nicht*/
-function downloadfontawesome(){
-    $pluginPath = plugins_url('', __FILE__);
-    $fontAwesomeUrl = 'https://fontawesome.com/v5.15.1/assets/font-awesome-5.15.1-web.zip'; // URL zur Font-Awesome-ZIP-Datei
-    $downloadPath =  $pluginPath . '/Font-Awesome-zip/font-awesome.zip'; // Pfad zum Herunterladen der ZIP-Datei
-    $extractPath =  $pluginPath . '/assets/fontawesome'; // Pfad zum Extrahieren der Font Awesome-Dateien
-
-    // Den Inhalt der Font-Awesome-ZIP-Datei herunterladen
-    $fileContents = file_get_contents($fontAwesomeUrl);
-
-    if ($fileContents !== false) {
-        // Datei im angegebenen Verzeichnis speichern
-        if (file_put_contents($downloadPath, $fileContents) !== false) {
-            // ZIP-Datei extrahieren
-            $zip = new ZipArchive();
-            if ($zip->open($downloadPath) === true) {
-                $zip->extractTo($extractPath);
-                $zip->close();
-                echo 'Font Awesome wurde erfolgreich heruntergeladen und in ' . $extractPath . ' extrahiert.';
-            } else {
-                echo 'Fehler beim Extrahieren der ZIP-Datei.';
-            }
-        } else {
-            echo 'Fehler beim Speichern der Font Awesome-Datei.';
-        }
-    } else {
-        echo 'Fehler beim Herunterladen der Font Awesome-Datei.';
-    }
-}
